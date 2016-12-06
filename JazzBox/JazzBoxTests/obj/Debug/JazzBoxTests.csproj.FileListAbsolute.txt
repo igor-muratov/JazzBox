@@ -1,0 +1,11 @@
+C:\src\my_github\JazzBox\JazzBox\JazzBoxTests\obj\Debug\JazzBoxTests.csprojResolveAssemblyReference.cache
+C:\src\my_github\JazzBox\JazzBox\JazzBoxTests\bin\Debug\JazzBoxTests.dll
+C:\src\my_github\JazzBox\JazzBox\JazzBoxTests\bin\Debug\JazzBoxTests.pdb
+C:\src\my_github\JazzBox\JazzBox\JazzBoxTests\bin\Debug\JazzBox.dll
+C:\src\my_github\JazzBox\JazzBox\JazzBoxTests\bin\Debug\Newtonsoft.Json.dll
+C:\src\my_github\JazzBox\JazzBox\JazzBoxTests\bin\Debug\nunit.framework.dll
+C:\src\my_github\JazzBox\JazzBox\JazzBoxTests\bin\Debug\JazzBox.pdb
+C:\src\my_github\JazzBox\JazzBox\JazzBoxTests\bin\Debug\Newtonsoft.Json.xml
+C:\src\my_github\JazzBox\JazzBox\JazzBoxTests\bin\Debug\nunit.framework.xml
+C:\src\my_github\JazzBox\JazzBox\JazzBoxTests\obj\Debug\JazzBoxTests.dll
+C:\src\my_github\JazzBox\JazzBox\JazzBoxTests\obj\Debug\JazzBoxTests.pdb

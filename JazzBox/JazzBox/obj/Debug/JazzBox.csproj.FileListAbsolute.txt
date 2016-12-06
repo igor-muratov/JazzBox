@@ -1,0 +1,7 @@
+C:\src\my_github\JazzBox\JazzBox\JazzBox\bin\Debug\JazzBox.dll
+C:\src\my_github\JazzBox\JazzBox\JazzBox\bin\Debug\JazzBox.pdb
+C:\src\my_github\JazzBox\JazzBox\JazzBox\bin\Debug\Newtonsoft.Json.dll
+C:\src\my_github\JazzBox\JazzBox\JazzBox\bin\Debug\Newtonsoft.Json.xml
+C:\src\my_github\JazzBox\JazzBox\JazzBox\obj\Debug\JazzBox.csprojResolveAssemblyReference.cache
+C:\src\my_github\JazzBox\JazzBox\JazzBox\obj\Debug\JazzBox.dll
+C:\src\my_github\JazzBox\JazzBox\JazzBox\obj\Debug\JazzBox.pdb
