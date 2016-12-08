@@ -2,19 +2,19 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace JazzBox.Json
 {
     public static class Helpers
-    {        
-        public static IEnumerable<Diff> GetDiff(this JToken expected, JToken actual)
+    {
+        public static void PassForDiffs(JToken expected, JToken actual, Action<Diff> diffFound)
         {
+            if (expected == null) throw new ArgumentNullException(nameof(expected));
+            if (actual   == null) throw new ArgumentNullException(nameof(actual));
+
             if (expected.Type != actual.Type)
             {
-                return new[] {
-                    new Diff(DiffType.Type, expected, actual)
-                };
+                diffFound(new Diff(DiffType.Type, expected, actual));
             }
             switch (expected.Type)
             {
@@ -23,40 +23,46 @@ namespace JazzBox.Json
                     var eo = expected as JObject;
 
                     var propComparer = new PropertyComparer();
-                    var aProps = new HashSet<JProperty>(ao.Properties(), propComparer);
-                    aProps.IntersectWith(eo.Properties());
-                    var valueDiffs = aProps.SelectMany(p => GetDiff(eo.Property(p.Name).Value, ao.Property(p.Name).Value));
+                    var aProps       = new HashSet<JProperty>(ao.Properties(), propComparer);
 
-                    IEnumerable<Diff> propDiff = new Diff[0];
+                    aProps.IntersectWith(eo.Properties());
+
+                    foreach(var p in aProps)
+                        PassForDiffs(eo.Property(p.Name).Value, ao.Property(p.Name).Value, diffFound);
 
                     if (aProps.Count != ao.Count)
                     {
                         var symmEx = new HashSet<JProperty>(ao.Properties(), propComparer);
                         symmEx.SymmetricExceptWith(eo.Properties());
-                        propDiff = symmEx.Select(p => new Diff(
-                            eo.Property(p.Name) != null ? DiffType.ExtraActual : DiffType.ExpectedNotFound,
-                            eo.Property(p.Name),
-                            ao.Property(p.Name)));
+
+                        foreach(var p in symmEx)
+                        {
+                            diffFound(new Diff(
+                                eo.Property(p.Name) != null ? DiffType.ExtraActual : DiffType.ExpectedNotFound,
+                                eo.Property(p.Name),
+                                ao.Property(p.Name)));
+                        }
                     }
-                    return propDiff.Concat(valueDiffs);
+                    break;
                 case JTokenType.Array:
-                    var aa = actual as JArray;
+                    var aa = actual   as JArray;
                     var ea = expected as JArray;
 
                     if (aa.Count != ea.Count)
-                        return new List<Diff> { new Diff(DiffType.ArrayCountMismatch, aa, ea) };
+                        diffFound(new Diff(DiffType.ArrayCountMismatch, aa, ea));
                     else
-                        return aa.Children()
-                            .Zip(ea.Children(), (a, e) => GetDiff(e, a))
-                            .SelectMany(i => i);
+                        for (int i = 0; i < aa.Count; i++)
+                            PassForDiffs(ea[i], aa[i], diffFound);
+                    break;
                 case JTokenType.Property:
-                    var ap = actual as JProperty;
+                    var ap = actual   as JProperty;
                     var ep = expected as JProperty;
                     var pDiffs = new List<Diff>(2);
                     if (ap.Name != ep.Name)
-                        pDiffs.Add(new Diff(DiffType.NameDiff, ep, ap));
-                    pDiffs.AddRange(GetDiff(ap.Value, ep.Value));
-                    return pDiffs;
+                        diffFound(new Diff(DiffType.PropNameDiff, ep, ap));
+
+                    PassForDiffs(ap.Value, ep.Value, diffFound);
+                    break;
                 case JTokenType.Comment:
                 case JTokenType.Integer:
                 case JTokenType.Float:
@@ -72,14 +78,22 @@ namespace JazzBox.Json
                 case JTokenType.TimeSpan:
                     if (!JValue.EqualityComparer.Equals(expected, actual))
                     {
-                        return new[] {
-                            new Diff(DiffType.ValueDiff, expected, actual)
-                        };
+                        diffFound(new Diff(DiffType.ValueDiff, expected, actual));
                     }
-                    return new List<Diff>();
+                    break;
                 default:
                     throw new NotSupportedException("Unsupported JToken type " + expected.Type);
             }
+        }
+
+        public static IList<Diff> GetDiff(this JToken expected, JToken actual)
+        {
+            if (expected == null) throw new ArgumentNullException(nameof(expected));
+            if (actual   == null) throw new ArgumentNullException(nameof(actual));
+
+            var diffs = new List<Diff>();
+            PassForDiffs(expected, actual, d => diffs.Add(d));
+            return diffs;
         }
 
         public class PropertyComparer : IEqualityComparer<JProperty>
@@ -114,7 +128,7 @@ namespace JazzBox.Json
     {
         Type,
         ValueDiff,
-        NameDiff,
+        PropNameDiff,
         ExpectedNotFound,
         ExtraActual,
         ArrayCountMismatch

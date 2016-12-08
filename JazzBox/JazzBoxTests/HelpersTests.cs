@@ -12,7 +12,7 @@ namespace JazzBox.Json.Tests
     [TestFixture()]
     public class HelpersTests
     {
-        [Test()]
+        [Test]
         public void GetDiffTest()
         {
             var x = JToken.Parse(@"{
@@ -41,6 +41,30 @@ namespace JazzBox.Json.Tests
                DiffType.ExtraActual,
                DiffType.ArrayCountMismatch
            }));
+        }
+
+        [Test]
+        public void CompareWithIgnore()
+        {
+            var x = JToken.Parse(@"{
+                a: 1,
+                b: ['2', 'w'],
+                e: 9,
+                x: [],
+                m: { k : 2 }
+            }");
+
+            var y = JToken.Parse(@"{
+                a: 3,
+                b: ['2', 'p'],
+                c: 'u',
+                x: [1],
+                m : { k : 2 }
+            }");
+
+            var toIgnore = new[] { "a", "b[1]", "e", "c", "x", "m.k" };
+            var diffs = x.GetDiff(y).Where(d => !toIgnore.Any(i => d.Expected?.Path == i || d.Actual?.Path == i));
+            Assert.AreEqual(0, diffs.Count());
         }
     }
 }
